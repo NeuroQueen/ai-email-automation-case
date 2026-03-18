@@ -1,0 +1,18 @@
+[
+  {
+    "user_id": "u-9921",
+    "first_name": "Александр",
+    "last_action": "viewed_pricing",
+    "days_inactive": 3,
+    "segment": "warm_lead",
+    "favorite_feature": "AI-summarization"
+  },
+  {
+    "user_id": "u-4402",
+    "first_name": "Мария",
+    "last_action": "export_report",
+    "days_inactive": 14,
+    "segment": "churning_pro",
+    "favorite_feature": "API-integration"
+  }
+]

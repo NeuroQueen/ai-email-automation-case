@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REF-2024-AUTO — Демо воркфлоу</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sber-green: #21A038;
+            --sber-turquoise: #22ccb4;
+            --sber-turquoise-dark: #1acbbd;
+            --sber-dark: #11877e;
+            --sber-bg: #f0fdf4;
+            --sber-card: #ffffff;
+            --sber-text: #1a1a1a;
+            --sber-text-muted: #5c6b73;
+            --sber-border: #e5e7eb;
+            --sber-shadow: 0 4px 24px rgba(34, 204, 180, 0.08);
+            --sber-radius: 16px;
+            --sber-radius-sm: 12px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Onest', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+            color: var(--sber-text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        .page {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--sber-turquoise) 0%, var(--sber-dark) 100%);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--sber-text);
+            margin: 0 0 0.5rem;
+        }
+        .subtitle {
+            color: var(--sber-text-muted);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .hero-card {
+            background: var(--sber-card);
+            border-radius: var(--sber-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--sber-shadow);
+            border: 1px solid rgba(34, 204, 180, 0.15);
+            text-align: center;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--sber-green) 0%, #1a8c2e 100%);
+            color: white;
+            border: none;
+            border-radius: var(--sber-radius-sm);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(33, 160, 56, 0.35);
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 160, 56, 0.4);
+        }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .btn svg { width: 20px; height: 20px; }
+        .loading {
+            text-align: center;
+            padding: 2.5rem;
+            color: var(--sber-text-muted);
+            font-weight: 500;
+        }
+        .spinner {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border: 3px solid var(--sber-border);
+            border-top-color: var(--sber-turquoise);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .step {
+            background: var(--sber-card);
+            border-radius: var(--sber-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--sber-shadow);
+            border-left: 4px solid var(--sber-turquoise);
+            display: none;
+        }
+        .step.visible {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--sber-turquoise) 0%, var(--sber-dark) 100%);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+        .step-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--sber-text);
+            margin-bottom: 0.35rem;
+        }
+        .step-title span { display: inline-flex; align-items: center; }
+        .step-desc {
+            color: var(--sber-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .step-data {
+            background: #f8fafc;
+            padding: 1rem 1.25rem;
+            border-radius: var(--sber-radius-sm);
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            color: #334155;
+            border: 1px solid var(--sber-border);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--sber-text);
+            margin: 2.5rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--sber-turquoise), var(--sber-green));
+            border-radius: 2px;
+        }
+        .email-card {
+            background: var(--sber-card);
+            border-radius: var(--sber-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--sber-shadow);
+            border: 1px solid var(--sber-border);
+        }
+        .email-card .meta {
+            color: var(--sber-text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--sber-border);
+        }
+        .email-card .meta strong { color: var(--sber-dark); }
+        .email-card .body {
+            line-height: 1.7;
+            color: var(--sber-text);
+        }
+        .criteria-wrap {
+            background: var(--sber-card);
+            border-radius: var(--sber-radius);
+            overflow: hidden;
+            box-shadow: var(--sber-shadow);
+            border: 1px solid var(--sber-border);
+        }
+        .criteria-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .criteria-table th {
+            background: #f8fafc;
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--sber-text-muted);
+        }
+        .criteria-table td {
+            padding: 14px 18px;
+            border-top: 1px solid var(--sber-border);
+        }
+        .criteria-table tr:hover td { background: #fafafa; }
+        .ok { color: var(--sber-green); font-weight: 600; }
+        .fail { color: #dc2626; font-weight: 600; }
+        .error-step {
+            border-left-color: #dc2626;
+            background: #fef2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="header">
+            <div class="badge">Campaign ID</div>
+            <h1>REF-2024-AUTO</h1>
+            <p class="subtitle">Генерация персонализированных писем на основе данных о поведении пользователя</p>
+        </header>
+
+        <div class="hero-card">
+            <button class="btn" id="runBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Запустить воркфлоу
+            </button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <span class="spinner"></span> Обработка данных...
+        </div>
+
+        <div id="steps"></div>
+        <div id="results"></div>
+        <div id="criteria"></div>
+    </div>
+
+    <script>
+        const runBtn = document.getElementById('runBtn');
+        const loading = document.getElementById('loading');
+        const stepsEl = document.getElementById('steps');
+        const resultsEl = document.getElementById('results');
+        const criteriaEl = document.getElementById('criteria');
+
+        runBtn.addEventListener('click', async () => {
+            runBtn.disabled = true;
+            loading.style.display = 'block';
+            stepsEl.innerHTML = '';
+            resultsEl.innerHTML = '';
+            criteriaEl.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/run', { method: 'POST' });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                loading.style.display = 'none';
+
+                for (let i = 0; i < data.steps.length; i++) {
+                    await new Promise(r => setTimeout(r, 800));
+                    const step = data.steps[i];
+                    const div = document.createElement('div');
+                    div.className = 'step';
+
+                    let dataHtml = '';
+                    if (step.type === 'input') {
+                        dataHtml = '<div class="step-data">' + JSON.stringify(step.data, null, 2) + '</div>';
+                    } else if (step.type === 'processing') {
+                        dataHtml = '<div class="step-data">' + step.data.map(x =>
+                            x.status === 'ok' ? '✓ ' + x.user_id + ' (' + x.first_name + '): ' + x.subject + '...' :
+                            x.status === 'warn' ? '⚠ ' + x.user_id + ': ' + x.subject + '...' :
+                            '✗ ' + x.user_id + ': ' + (x.message || 'ошибка')
+                        ).join('\n') + '</div>';
+                    } else if (step.type === 'validation') {
+                        dataHtml = '<div class="step-data">' + step.data.map(x =>
+                            (x.valid ? '✓' : '✗') + ' ' + x.user_id + ': Subject ' + x.subject_len + ' симв., Body ' + x.body_len + ' симв.' + (x.errors.length ? ' — ' + x.errors.join('; ') : '')
+                        ).join('\n') + '</div>';
+                    }
+
+                    div.innerHTML = '<div class="step-title"><span><span class="step-num">' + step.id + '</span>' + step.title + '</span></div><div class="step-desc">' + step.description + '</div>' + dataHtml;
+                    stepsEl.appendChild(div);
+                    div.classList.add('visible');
+                }
+
+                await new Promise(r => setTimeout(r, 600));
+                resultsEl.innerHTML = '<h2 class="section-title">Финальный результат: сгенерированные письма</h2>';
+                data.results.filter(r => !r.error).forEach(r => {
+                    const card = document.createElement('div');
+                    card.className = 'email-card';
+                    card.innerHTML = '<div class="meta"><strong>Кому:</strong> ' + r.first_name + ' (' + r.user_id + ') · <strong>Тема:</strong> ' + r.subject + '</div>' +
+                        '<div class="body">' + r.body.replace(/\n/g, '<br>') + '</div>';
+                    resultsEl.appendChild(card);
+                });
+
+                await new Promise(r => setTimeout(r, 600));
+                criteriaEl.innerHTML = '<h2 class="section-title">Критерии качества (ТЗ)</h2>' +
+                    '<div class="criteria-wrap"><table class="criteria-table"><thead><tr><th>Критерий</th><th>Статус</th><th>Детали</th></tr></thead><tbody>' +
+                    data.quality_criteria.map(c => '<tr><td>' + c.name + '</td><td class="' + (c.met ? 'ok' : 'fail') + '">' + (c.met ? '✓ Достигнут' : '✗ Не достигнут') + '</td><td>' + (c.detail || '') + '</td></tr>').join('') +
+                    '</tbody></table></div>';
+            } catch (err) {
+                loading.style.display = 'none';
+                const errDiv = document.createElement('div');
+                errDiv.className = 'step visible error-step';
+                errDiv.innerHTML = '<div class="step-title">Ошибка</div><div class="step-desc">' + err.message + '</div>';
+                stepsEl.appendChild(errDiv);
+            }
+            runBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>
